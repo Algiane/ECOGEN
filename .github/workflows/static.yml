@@ -52,7 +52,11 @@ jobs:
      - name: whoami
        run: >
           pwd && ls
+          
+     - name: whoami2
+       run: >
           echo "branch:  ${{ github.head_ref || github.ref_name }}"
+          
      - name: Sphinx build
        run: |
           cd docs/sphinx_doc && make html
