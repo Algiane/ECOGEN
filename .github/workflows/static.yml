@@ -28,11 +28,20 @@ jobs:
 
    runs-on: ubuntu-latest
 
-   steps:   
-     - name: Checkout repo (with tags)
-       uses: actions/checkout@v4
+   steps:
+     - name: Checkout doc sources
+       uses: actions/checkout@v5
+       with:
+         path: doc_sources
+         sparse-checkout: |
+           docs
+
+     - name: Checkout website
+       uses: actions/checkout@v5
        with:
          fetch-depth: 0
+         ref: gh-pages
+         path: website
 
      - name: Set up Python
        run: |
@@ -53,20 +62,22 @@ jobs:
 
      - name: Sphinx build
        run: |
-          cd docs/sphinx_docs && make html
+          cd doc_sources/docs/sphinx_docs && make html
 
      #- name: Doxygen build
      #  run: |
-     #     cd docs/doxygen_docs && doxygen doxygen.conf
+     #     cd doc_sources/docs/doxygen_docs && doxygen doxygen.conf
+
+     - name: Clean old documentation
+       run: |
+          rm -rf website/docs/sphinx_docs/*
+          rm -rf website/docs/doxygen_docs/*
 
      - name: Move builds to directory to publish
        run: |
           mkdir -p temp/docs
-          mv docs/sphinx_docs/build/html temp/docs/sphinx_docs
-          #mv docs/doxygen_docs/build/html temp/docs/doxygen_docs
-
-     - name: Setup Pages
-       uses: actions/configure-pages@v5
+          mv doc_sources/docs/sphinx_docs/build/html website/docs/sphinx_docs
+          #mv doc_sources/docs/doxygen_docs/build/html website/docs/doxygen_docs
 
      - name: Deploy documentation to GitHub Pages
        uses: peaceiris/actions-gh-pages@v4
@@ -74,5 +85,5 @@ jobs:
        with:
          publish_branch: gh-pages
          github_token: ${{ secrets.GITHUB_TOKEN }}
-         publish_dir: temp
+         publish_dir: website
          force_orphan: true
