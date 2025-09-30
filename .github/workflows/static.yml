@@ -36,42 +36,38 @@ jobs:
        run: |
           pip install sphinx==5.3.0 sphinx_rtd_theme setuptools docutils==0.17.1 sphinxcontrib.bibtex
 
-     #- name: Install APT dependencies (doxygen, graphviz, TeX)
-     #  run: |
-     #    sudo apt-get update
-     #    sudo apt-get install -y \
-     #      doxygen doxygen-doc doxygen-latex \
-     #      graphviz \
-     #      texlive texlive-latex-extra latexmk
-
-     - name: Install Python dependencies (Sphinx toolchain)
+     - name: Install APT dependencies (doxygen, graphviz, TeX)
        run: |
-         python -m pip install --upgrade pip
-         pip install sphinx sphinx_rtd_theme sphinx-numfig sphinxcontrib-bibtex
+         sudo apt-get update
+         sudo apt-get install -y \
+           doxygen doxygen-doc doxygen-latex \
+           graphviz \
+           texlive texlive-latex-extra latexmk
 
-     - name: whoami
-       run: >
-          pwd && ls
-          
-     - name: whoami2
-       run: >
-          echo "branch:  ${{ github.head_ref || github.ref_name }}"
-          
+     #- name: Install Python dependencies (Sphinx toolchain)
+     #  run: |
+     #    python -m pip install --upgrade pip
+     #    pip install sphinx sphinx_rtd_theme sphinx-numfig sphinxcontrib-bibtex
+
      - name: Sphinx build
        run: |
           cd docs/sphinx_docs && make html
 
-     #- name: Doxygen build
-     #  run: |
-     #     cd docs/doxygen && doxygen doxygen.conf
+     - name: Doxygen build
+       run: |
+          cd docs/doxygen_docs && doxygen doxygen.conf
 
-     - name: Deploy to GitHub Pages
-       uses: peaceiris/actions-gh-pages@v3
+     - name: Move builds to directory to publish
+       run: |
+          mkdir ./docs
+          mv docs/sphinx_docs/html docs/sphinx_docs
+          mv docs/doxygen_docs/html docs/sphinx_docs
+
+     - name: Deploy documentation to GitHub Pages
+       uses: peaceiris/actions-gh-pages@v4
        #if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/devel' }}
        with:
          publish_branch: gh-pages
          github_token: ${{ secrets.GITHUB_TOKEN }}
-         publish_dir: docs/sphinx_doc/build/html
+         publish_dir: docs
          force_orphan: true
-
-
