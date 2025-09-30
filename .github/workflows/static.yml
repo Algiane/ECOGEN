@@ -25,16 +25,14 @@ jobs:
    runs-on: ubuntu-latest
 
    steps:
+     - uses: actions/checkout@v4
+     - uses: actions/setup-python@v5
+     
      - name: Checkout repo (with tags)
-       uses: actions/checkout@v4
        with:
          fetch-depth: 0
 
      - name: Set up Python
-       uses: actions/setup-python@v5
-       with:
-         python-version: '3.x'
-         cache: 'pip'
        run: |
           pip install sphinx==5.3.0 sphinx_rtd_theme setuptools docutils==0.17.1 sphinxcontrib.bibtex
 
