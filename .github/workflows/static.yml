@@ -35,8 +35,6 @@ jobs:
        uses: actions/checkout@v5
        with:
          path: doc_sources
-         sparse-checkout: |
-           docs
 
      - name: Checkout website
        uses: actions/checkout@v5
