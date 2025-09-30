@@ -2,30 +2,29 @@
 name: Deploy documentation to Github Pages
 
 on:
- push:
-   tags:
-     - 'v*'    # trigger on vX, vX.Y, vX.Y.Z, etc.
- workflow_dispatch:
+  push:
+    tags:
+      - 'v*'    # trigger on vX, vX.Y, vX.Y.Z, etc.
+      - branches: ["devel"]
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
- contents: write   # required to write on gh-pages
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 jobs:
  build-and-deploy:
    runs-on: ubuntu-latest
-
-   env:
-     ECOGEN_ENV: production
-     TARGET_BRANCH: gh-pages
-     # Reuse GitHub Actions token to push.
-     GIT_DEPLOY_REPO: https://${{ secrets.GITHUB_TOKEN }}@github.com/code-mphi/ECOGEN.git
-
-     # Shims Travis
-     TRAVIS: "true"
-     TRAVIS_REPO_SLUG: ${{ github.repository }}
-     TRAVIS_BUILD_DIR: ${{ github.workspace }}
-     TRAVIS_BRANCH: ${{ github.ref_name }}
-     TRAVIS_TAG: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || '' }}
 
    steps:
      - name: Checkout repo (with tags)
@@ -52,11 +51,21 @@ jobs:
          python -m pip install --upgrade pip
          pip install sphinx sphinx_rtd_theme sphinx-numfig sphinxcontrib-bibtex
 
-     - name: Configure Git user (for gh-pages push)
+     - name: Sphinx build
        run: |
-         git config user.name "Travis CI"
-         git config user.email "ecogen@code-mphi.fr"
+          cd docs/sphinx_doc && make html
 
-     - name: Run build & deploy script
-       run: |
-         bash ./scripts/travis/buildAndDeploy.sh
+     - name: Doxygen build
+        run: |
+          cd docs/doxygen && doxygen doxygen.conf
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+        with:
+          publish_branch: gh-pages
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/sphinx_doc/build/html
+          force_orphan: true
+
+
