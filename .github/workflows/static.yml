@@ -3,7 +3,9 @@ name: Deploy documentation to Github Pages
 
 on:
   push:
-    branches: ["devel"]
+    # Pattern matched against refs/tags
+    tags:
+      - '**'           # Push events to every tag including hierarchical tags like v1.0/beta
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -47,26 +49,21 @@ jobs:
        run: |
           pip install -r doc_sources/docs/sphinx_docs/requirements.req
 
-     #- name: Install APT dependencies (doxygen, graphviz, TeX)
-     #  run: |
-     #    sudo apt-get update
-     #    sudo apt-get install -y \
-     #      doxygen doxygen-doc doxygen-latex \
-     #      graphviz \
-     #      texlive texlive-latex-extra latexmk
-
-     #- name: Install Python dependencies (Sphinx toolchain)
-     #  run: |
-     #    python -m pip install --upgrade pip
-     #    pip install sphinx sphinx_rtd_theme sphinx-numfig sphinxcontrib-bibtex
+     - name: Install APT dependencies (doxygen, graphviz, TeX)
+       run: |
+         sudo apt-get update
+         sudo apt-get install -y \
+           doxygen doxygen-doc doxygen-latex \
+           graphviz \
+           texlive texlive-latex-extra latexmk
 
      - name: Sphinx build
        run: |
           cd doc_sources/docs/sphinx_docs && make html
 
-     #- name: Doxygen build
-     #  run: |
-     #     cd doc_sources/docs/doxygen_docs && doxygen doxygen.conf
+     - name: Doxygen build
+       run: |
+          cd doc_sources/docs/doxygen_docs && doxygen doxygen.conf
 
      - name: Clean old documentation
        run: |
@@ -77,11 +74,10 @@ jobs:
        run: |
           mkdir -p temp/docs
           mv doc_sources/docs/sphinx_docs/build/html website/docs/sphinx_docs
-          #mv doc_sources/docs/doxygen_docs/build/html website/docs/doxygen_docs
+          mv doc_sources/docs/doxygen_docs/build/html website/docs/doxygen_docs
 
      - name: Deploy documentation to GitHub Pages
        uses: peaceiris/actions-gh-pages@v4
-       #if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/devel' }}
        with:
          publish_branch: gh-pages
          github_token: ${{ secrets.GITHUB_TOKEN }}
