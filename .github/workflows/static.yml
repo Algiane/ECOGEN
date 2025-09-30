@@ -67,12 +67,11 @@ jobs:
 
      - name: Clean old documentation
        run: |
-          rm -rf website/docs/sphinx_docs/*
-          rm -rf website/docs/doxygen_docs/*
+          rm -rf website/docs/sphinx_docs
+          rm -rf website/docs/doxygen_docs
 
      - name: Move builds to directory to publish
        run: |
-          mkdir -p temp/docs
           mv doc_sources/docs/sphinx_docs/build/html website/docs/sphinx_docs
           mv doc_sources/docs/doxygen_docs/build/html website/docs/doxygen_docs
 
