@@ -25,7 +25,7 @@ jobs:
    runs-on: ubuntu-latest
 
    steps:   
-     - uses: actions/setup-python@v5
+     #- uses: actions/setup-python@v5
 
      - name: Checkout repo (with tags)
        uses: actions/checkout@v4
@@ -34,15 +34,15 @@ jobs:
 
      - name: Set up Python
        run: |
-          pip install sphinx==5.3.0 sphinx_rtd_theme setuptools docutils==0.17.1 sphinxcontrib.bibtex
+          pip install -r docs/sphinx_docs/requirements.req
 
-     - name: Install APT dependencies (doxygen, graphviz, TeX)
-       run: |
-         sudo apt-get update
-         sudo apt-get install -y \
-           doxygen doxygen-doc doxygen-latex \
-           graphviz \
-           texlive texlive-latex-extra latexmk
+     #- name: Install APT dependencies (doxygen, graphviz, TeX)
+     #  run: |
+     #    sudo apt-get update
+     #    sudo apt-get install -y \
+     #      doxygen doxygen-doc doxygen-latex \
+     #      graphviz \
+     #      texlive texlive-latex-extra latexmk
 
      #- name: Install Python dependencies (Sphinx toolchain)
      #  run: |
@@ -53,15 +53,15 @@ jobs:
        run: |
           cd docs/sphinx_docs && make html
 
-     - name: Doxygen build
-       run: |
-          cd docs/doxygen_docs && doxygen doxygen.conf
+     #- name: Doxygen build
+     #  run: |
+     #     cd docs/doxygen_docs && doxygen doxygen.conf
 
      - name: Move builds to directory to publish
        run: |
-          mkdir ./docs
-          mv docs/sphinx_docs/html docs/sphinx_docs
-          mv docs/doxygen_docs/html docs/sphinx_docs
+          mkdir -p temp/docs
+          mv docs/sphinx_docs/html temp/docs/sphinx_docs
+          #mv docs/doxygen_docs/html temp/docs/sphinx_docs
 
      - name: Deploy documentation to GitHub Pages
        uses: peaceiris/actions-gh-pages@v4
@@ -69,5 +69,5 @@ jobs:
        with:
          publish_branch: gh-pages
          github_token: ${{ secrets.GITHUB_TOKEN }}
-         publish_dir: docs
+         publish_dir: temp/docs
          force_orphan: true
