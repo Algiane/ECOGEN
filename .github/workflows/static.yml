@@ -24,11 +24,12 @@ jobs:
  build-and-deploy:
    runs-on: ubuntu-latest
 
-   steps:
+   steps:   
      - uses: actions/checkout@v4
      - uses: actions/setup-python@v5
-     
+
      - name: Checkout repo (with tags)
+       uses: actions/checkout@v4
        with:
          fetch-depth: 0
 
