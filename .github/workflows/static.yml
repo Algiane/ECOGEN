@@ -25,7 +25,6 @@ jobs:
    runs-on: ubuntu-latest
 
    steps:   
-     - uses: actions/checkout@v4
      - uses: actions/setup-python@v5
 
      - name: Checkout repo (with tags)
@@ -50,6 +49,10 @@ jobs:
          python -m pip install --upgrade pip
          pip install sphinx sphinx_rtd_theme sphinx-numfig sphinxcontrib-bibtex
 
+     - name: whoami
+       run: >
+          pwd && ls
+          echo "branch:  ${{ github.head_ref || github.ref_name }}"
      - name: Sphinx build
        run: |
           cd docs/sphinx_doc && make html
