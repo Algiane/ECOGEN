@@ -59,7 +59,7 @@ jobs:
           
      - name: Sphinx build
        run: |
-          cd docs/sphinx_doc && make html
+          cd docs/sphinx_docs && make html
 
      #- name: Doxygen build
      #  run: |
