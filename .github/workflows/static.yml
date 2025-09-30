@@ -45,7 +45,7 @@ jobs:
 
      - name: Set up Python
        run: |
-          pip install -r docs/sphinx_docs/requirements.req
+          pip install -r doc_sources/docs/sphinx_docs/requirements.req
 
      #- name: Install APT dependencies (doxygen, graphviz, TeX)
      #  run: |
