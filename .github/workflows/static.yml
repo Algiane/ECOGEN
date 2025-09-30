@@ -56,16 +56,16 @@ jobs:
           cd docs/sphinx_doc && make html
 
      - name: Doxygen build
-        run: |
+       run: |
           cd docs/doxygen && doxygen doxygen.conf
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-        with:
-          publish_branch: gh-pages
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: docs/sphinx_doc/build/html
-          force_orphan: true
+     - name: Deploy to GitHub Pages
+       uses: peaceiris/actions-gh-pages@v3
+       if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+       with:
+         publish_branch: gh-pages
+         github_token: ${{ secrets.GITHUB_TOKEN }}
+         publish_dir: docs/sphinx_doc/build/html
+         force_orphan: true
 
 
