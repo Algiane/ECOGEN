@@ -1,0 +1,7 @@
+<?xml version = "1.0" encoding = "UTF-8" standalone = "yes"?>
+<parametersEOS>
+	<EOS type="SW"/>
+	<parameters
+		gravity="9.81">
+	</parameters>
+</parametersEOS>

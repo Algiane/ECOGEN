@@ -68,6 +68,7 @@ class CellInterface
                               Limiter& /*globalVolumeFractionLimiter*/,
                               Limiter& /*interfaceVolumeFractionLimiter*/,
                               Prim /*type*/ = vecPhases);
+
     virtual void initialize(Cell* cellLeft, Cell* cellRight);
     void initializeGauche(Cell* cellLeft);
     virtual void initializeDroite(Cell* cellRight);
