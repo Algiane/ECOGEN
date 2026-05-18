@@ -309,7 +309,7 @@ class Eos
 
     //Get
     //! \brief See derived classes
-    virtual const double& getG() const { return Errors::defaultDouble; };
+    virtual const double& getGravity() const { return Errors::defaultDouble; };
     //! \brief See derived classes
     virtual const double& getGamma() const { return Errors::defaultDouble; };
     //! \brief See derived classes

@@ -109,7 +109,6 @@ void ModShallowWater::solveRiemannIntern(
   //compute left and right mass flow rates and sM
   double mL(hL * (sL - uL)), mR(hR * (sR - uR));
   double sM((pR - pL + mL * uL - mR * uR) / (mL - mR));
-  if (std::fabs(sM) < 1.e-8) sM = 0.;
 
   if (sL > 0.) {
     static_cast<FluxShallowWater*>(fluxBuff)->m_mass = hL * uL;
@@ -122,53 +121,22 @@ void ModShallowWater::solveRiemannIntern(
     static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setY(hR * vR * uR);
   }
   // HLLC
-  else if (std::fabs(sR - sL) > 1.e-3) {
-#warning to understand
-    static_cast<FluxShallowWater*>(fluxBuff)->m_mass = (hR * uR * sL - hL * uL * sR + sL * sR * (hL - hR)) / (sL - sR);
-    double momFluxX = ((hR * uR * uR + pR) * sL - (hL * uL * uL + pL) * sR + sL * sR * (hL * uL - hR * uR)) / (sL - sR);
-    //Correction for W-P scheme
-    //momFluxX += 0.5*phaseLeft->getEos()->getG()*(hL+hR)*(zR-zL);
-    static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setX(momFluxX);
-    if (sM >= 0) {
-      static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setY(static_cast<FluxShallowWater*>(fluxBuff)->m_mass * vL);
-    }
-    else {
-      static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setY(static_cast<FluxShallowWater*>(fluxBuff)->m_mass * vR);
-    }
+  else if (sM > 0.) {
+    double pStar = mL * (sM - uL) + pL;
+    double hStar = mL / (sL - sM);
+
+    static_cast<FluxShallowWater*>(fluxBuff)->m_mass = hStar * sM;
+    static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setX(hStar * sM * sM + pStar);
+    static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setY(hStar * sM * vL);
   }
   else {
-    std::cout << "Unexpected, sL = sR = " << sL << std::endl;
-    exit(EXIT_FAILURE);
+    double pStar = mR * (sM - uR) + pR;
+    double hStar = mR / (sR - sM);
+
+    static_cast<FluxShallowWater*>(fluxBuff)->m_mass = hStar * sM;
+    static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setX(hStar * sM * sM + pStar);
+    static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setY(hStar * sM * vR);
   }
-
-  // HLLC Euler
-  // else if (sM >= 0.) {
-  //   double pStar   = mL * (sM - uL) + pL;
-  //   double rhoStar = mL / (sL - sM);
-
-  //   static_cast<FluxShallowWater*>(fluxBuff)->m_mass = rhoStar * sM;
-  //   static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setX(rhoStar * sM * sM + pStar);
-  //   static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setY(rhoStar * sM * vL);
-
-  // }
-  // else {
-  //   double pStar   = mR * (sM - uR) + pR;
-  //   double rhoStar = mR / (sR - sM);
-  //   double Estar   = ER + (sM - uR) * (sM + pR / mR);
-
-  //   static_cast<FluxShallowWater*>(fluxBuff)->m_mass = rhoStar * sM;
-  //   static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setX(rhoStar * sM * sM + pStar);
-  //   static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setY(rhoStar * sM * vR);
-  //   static_cast<FluxShallowWater*>(fluxBuff)->m_momentum.setZ(rhoStar * sM * wR);
-  //   static_cast<FluxShallowWater*>(fluxBuff)->m_energ = (rhoStar * Estar + pStar) * sM;
-
-  //   // Boundary data for output
-  //   boundData[VarBoundary::p]    = pStar;
-  //   boundData[VarBoundary::rho]  = rhoStar;
-  //   boundData[VarBoundary::velU] = sM;
-  //   boundData[VarBoundary::velV] = vR;
-  //   boundData[VarBoundary::velW] = wR;
-  // }
 
   //Contact discontinuity
   static_cast<FluxShallowWater*>(fluxBuff)->m_sM = sM;

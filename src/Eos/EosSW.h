@@ -60,16 +60,9 @@ class EosSW : public Eos
     double computeSoundSpeed(const double& height) const override;
 
     //Getters
-    //! \brief  Get the gravity parameter
-    //! \return the gravity parameter 'm_g'
-    const double& getG() const override { return m_g; };
-
-    //! \brief  Get the type that is to say the reduced name of the EOS in ECOGEN
-    //! \return \f$ \ "SW" \f$
-    TypeEOS getType() const override { return TypeEOS::SW; };
 
   private:
-    double m_g; //!< Gravity
+    double m_gravity; //!< Gravity
 };
 
 #endif // EOSSW_H

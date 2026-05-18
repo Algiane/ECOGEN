@@ -44,8 +44,8 @@ void EosSW::assignParametersEos(std::string name, std::vector<double> parameters
 {
   assert(parametersEos.size() == 1);
 
-  m_name = name;
-  m_g    = parametersEos[0];
+  m_name    = name;
+  m_gravity = parametersEos[0];
 }
 
 //***********************************************************************
@@ -53,10 +53,10 @@ void EosSW::assignParametersEos(std::string name, std::vector<double> parameters
 //Constant methods
 //****************
 
-double EosSW::computePressure(const double& height) const { return 0.5 * m_g * height * height; }
+double EosSW::computePressure(const double& height) const { return 0.5 * m_gravity * height * height; }
 
 //***********************************************************************
 
-double EosSW::computeSoundSpeed(const double& height) const { return sqrt(m_g * std::max(height, 1.e-6)); }
+double EosSW::computeSoundSpeed(const double& height) const { return sqrt(m_gravity * std::max(height, 1.e-6)); }
 
 //***********************************************************************
